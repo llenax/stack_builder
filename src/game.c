@@ -13,22 +13,19 @@ void run()
   SetTargetFPS(60);
   ToggleFullscreen();
 
-  Camera2D camera = { 0 };
-  Camera_Init(&camera);
-
   GameState gameState;
-  GameState_Init(&gameState, &camera);
+  GameState_Init(&gameState);
 
-  loop(&gameState, &camera);
+  loop(&gameState);
 
   CloseWindow();
 }
 
-void draw(GameState* gs, Camera2D* camera)
+void draw(GameState* gs)
 {
   BeginDrawing();
   ClearBackground(LIGHTGRAY);
-  BeginMode2D(*camera);
+  BeginMode2D(gs->camera);
 
   DrawRectangleRec((Rectangle){
     gs->anchorEntity.position.x,
@@ -68,19 +65,19 @@ void draw(GameState* gs, Camera2D* camera)
   EndDrawing();
 }
 
-void loop(GameState* gs, Camera2D* camera)
+void loop(GameState* gs)
 {
   while (!WindowShouldClose())
   {
     gs->anchorEntity.position.x = gs->groundEntity.position.x;
-    Camera_SetTarget(camera, (Vector2) {
+    Camera_SetTarget(&gs->camera, (Vector2) {
       .x = 0,
       .y = gs->anchorEntity.position.y
     });
 
     gs->connectionEntity = Entity_Connection(gs);
 
-    Entity_UpdateMoving(gs, camera);
+    Entity_UpdateMoving(gs);
     Entity_UpdateFalling(gs);
 
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !gs->entityFalling)
@@ -88,6 +85,6 @@ void loop(GameState* gs, Camera2D* camera)
       Entity_SetFalling(gs);
     }
 
-    draw(gs, camera);
+    draw(gs);
   }
 }

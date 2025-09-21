@@ -1,15 +1,16 @@
-#include "gamestate.h"
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 
-void GameState_Init(GameState* gs, Camera2D* camera)
+#include "gamestate.h"
+#include "camera.h"
+
+void GameState_Init(GameState* gs)
 {
-  memset(gs, 0, sizeof(*gs));
+  memset(gs, 0, sizeof *gs);
 
   gs->score = 0;
-  gs->entities = nullptr;
-  gs->entityCount = 0;
+  gs->entities = (EntityStack){0};
   gs->movingEntity = (Entity) {
     .width = 100,
     .height = 100,
@@ -29,18 +30,26 @@ void GameState_Init(GameState* gs, Camera2D* camera)
   gs->angular_velocity = 1.5f;
   gs->entityFalling = 0;
 
-  GameState_SetGround(gs, camera);
+  EntityStack_Init(&gs->entities);
+
+  Camera2D camera = { 0 };
+  Camera_Init(&camera);
+
+  gs->camera = camera;
+
+  GameState_SetGround(gs);
 }
 
 void GameState_Reset(GameState* gs)
 {
-  free(gs->entities);
-  gs->entities = NULL;
-  gs->entityCount = 0;
+  EntityStack_Clear(&gs->entities);
+
   gs->fallingEntity = (Entity){0};
   gs->entityFalling = 0;
   gs->score = 0;
   gs->anchorEntity.position.y = 0;
+  
+  GameState_SetGround(gs);
 }
 
 void GameState_IncrementScore(GameState* gs)
@@ -48,7 +57,7 @@ void GameState_IncrementScore(GameState* gs)
   gs->score++;
 }
 
-void GameState_SetGround(GameState* gs, Camera2D* camera)
+void GameState_SetGround(GameState* gs)
 {
   Entity ground = (Entity) {
     .width = 100,
@@ -59,9 +68,9 @@ void GameState_SetGround(GameState* gs, Camera2D* camera)
   ground.position = GetScreenToWorld2D((Vector2){
     .x = GetScreenWidth() / 2 - (ground.width / 2),
     .y = GetScreenHeight() - ground.height
-  }, *camera);
+  }, gs->camera);
 
   gs->groundEntity = ground;
 
-  Entity_AddNew(gs, ground);
+  EntityStack_Push(&gs->entities, ground);
 }

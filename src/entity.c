@@ -21,20 +21,6 @@ Vector2 Entity_GroundPosition(Entity* ground, int offset)
 }
 
 
-void Entity_AddNew(GameState* gs, Entity entity)
-{
-  gs->entities = realloc(
-    gs->entities,
-    (gs->entityCount + 1) * sizeof(Entity)
-  );
-  gs->entities[gs->entityCount] = entity;
-  gs->entityCount++;
-}
-
-void Entity_MoveAnchor(GameState* gs, Entity* entity)
-{
-  gs->anchorEntity.position.y -= entity->height;
-}
 
 bool Entity_Overlaps(Entity* entityA, Entity* entityB)
 {
@@ -53,10 +39,22 @@ void Entity_Land(GameState* gs, Entity* box, Vector2 landingPos)
     return;
   }
 
+  if(EntityStack_Size(&gs->entities) > 2)
+  {
+    EntityStack_Pop(&gs->entities);
+
+    for(int i = 1; i <= 2; i++)
+    {
+      Entity* prev = EntityStack_Get(&gs->entities, EntityStack_Size(&gs->entities) - i);
+      prev->position.y += box->height;
+    }
+
+    box->position.y += box->height;
+  }
+
   gs->groundEntity = *box;
 
-  Entity_AddNew(gs, *box);
-  Entity_MoveAnchor(gs, box);
+  EntityStack_Push(&gs->entities, *box);
   GameState_IncrementScore(gs);
 }
 
@@ -108,7 +106,7 @@ EntityConnection Entity_Connection(GameState* gs)
   };
 }
 
-void Entity_UpdateMoving(GameState* gs, Camera2D* camera)
+void Entity_UpdateMoving(GameState* gs)
 {
   const float radius_x = 140.0f;
   const float radius_y = 90.0f;
@@ -141,13 +139,13 @@ void Entity_DrawEntityRec(Entity* entity, Color color)
 
 void Entity_DrawEntities(GameState* gs)
 {
-  for(size_t i = 0; i < gs->entityCount; i++)
+  for(size_t i = 0; i < EntityStack_Size(&gs->entities); i++)
   {
-    Entity entity = gs->entities[i];
-    if(entity.isGround){
-      Entity_DrawEntityRec(&entity, RED);
+    Entity* entity = EntityStack_Get(&gs->entities, i);
+    if(entity->isGround){
+      Entity_DrawEntityRec(entity, RED);
     } else {
-      Entity_DrawEntityRec(&entity, GREEN);
+      Entity_DrawEntityRec(entity, GREEN);
     }
   }
 }
@@ -174,4 +172,47 @@ void Entity_SetFalling(GameState* gs)
     },
     .isGround = 0
   };
+}
+
+void EntityStack_Init(EntityStack* es)
+{
+  es->head = es->tail = es->count = 0;
+}
+
+int EntityStack_Push(EntityStack* es, Entity entity)
+{
+  if(es->count == MAX_ENTITY_STACK) return -1;
+
+  es->buf[es->tail] = entity;
+  es->tail = (es->tail + 1) % MAX_ENTITY_STACK;
+  es->count++;
+
+  return 0;
+}
+
+void EntityStack_Pop(EntityStack* es)
+{
+  if(es->count == 0) return;
+  es->head = (es->head + 1) % MAX_ENTITY_STACK;
+  es->count--;
+}
+
+Entity* EntityStack_Get(EntityStack* es, size_t index)
+{
+  if(index >= es->count) return NULL;
+  size_t at = (es->head + index) % MAX_ENTITY_STACK;
+  return &es->buf[at];
+}
+
+void EntityStack_Clear(EntityStack* es)
+{
+  memset(es->buf, 0, sizeof(es->buf));
+  es->head = 0;
+  es->tail = 0;
+  es->count = 0;
+}
+
+int EntityStack_Size(EntityStack* es)
+{
+  return es->count;
 }
