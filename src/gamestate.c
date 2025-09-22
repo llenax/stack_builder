@@ -35,6 +35,11 @@ void GameState_Init(GameState* gs)
   Camera2D camera = { 0 };
   Camera_Init(&camera);
 
+  camera.target = (Vector2) {
+    .x = (-GetScreenWidth() / 2),
+    .y = 0
+  };
+
   gs->camera = camera;
 
   GameState_SetGround(gs);
@@ -60,8 +65,8 @@ void GameState_IncrementScore(GameState* gs)
 void GameState_SetGround(GameState* gs)
 {
   Entity ground = (Entity) {
-    .width = 100,
-    .height = 100,
+    .width = GetScreenWidth(),
+    .height = 50,
     .isGround = 1
   };
 

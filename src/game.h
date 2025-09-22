@@ -5,10 +5,9 @@
 #include "gamestate.h"
 #include "camera.h"
 
-void draw(GameState* gs);
-void loop(GameState* gs);
+void update(GameState* gs);
+void render(GameState* gs);
 void init();
-void close();
 void run();
 
 #endif

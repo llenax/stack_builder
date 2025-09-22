@@ -16,12 +16,16 @@ void run()
   GameState gameState;
   GameState_Init(&gameState);
 
-  loop(&gameState);
+  while (!WindowShouldClose())
+  {
+    update(&gameState);
+    render(&gameState);
+  }
 
   CloseWindow();
 }
 
-void draw(GameState* gs)
+void render(GameState* gs)
 {
   BeginDrawing();
   ClearBackground(LIGHTGRAY);
@@ -65,26 +69,15 @@ void draw(GameState* gs)
   EndDrawing();
 }
 
-void loop(GameState* gs)
+void update(GameState* gs)
 {
-  while (!WindowShouldClose())
+  gs->connectionEntity = Entity_Connection(gs);
+
+  Entity_UpdateMoving(gs);
+  Entity_UpdateFalling(gs);
+
+  if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !gs->entityFalling)
   {
-    gs->anchorEntity.position.x = gs->groundEntity.position.x;
-    Camera_SetTarget(&gs->camera, (Vector2) {
-      .x = 0,
-      .y = gs->anchorEntity.position.y
-    });
-
-    gs->connectionEntity = Entity_Connection(gs);
-
-    Entity_UpdateMoving(gs);
-    Entity_UpdateFalling(gs);
-
-    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !gs->entityFalling)
-    {
-      Entity_SetFalling(gs);
-    }
-
-    draw(gs);
+    Entity_SetFalling(gs);
   }
 }

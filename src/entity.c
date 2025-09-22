@@ -20,8 +20,6 @@ Vector2 Entity_GroundPosition(Entity* ground, int offset)
   };
 }
 
-
-
 bool Entity_Overlaps(Entity* entityA, Entity* entityB)
 {
   return (entityB->position.x + entityB->width > entityA->position.x &&
@@ -39,11 +37,11 @@ void Entity_Land(GameState* gs, Entity* box, Vector2 landingPos)
     return;
   }
 
-  if(EntityStack_Size(&gs->entities) > 2)
+  if(EntityStack_Size(&gs->entities) > MAX_ENTITY_STACK - 1)
   {
     EntityStack_Pop(&gs->entities);
 
-    for(int i = 1; i <= 2; i++)
+    for(int i = 1; i <= MAX_ENTITY_STACK - 1; i++)
     {
       Entity* prev = EntityStack_Get(&gs->entities, EntityStack_Size(&gs->entities) - i);
       prev->position.y += box->height;
