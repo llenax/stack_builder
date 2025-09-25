@@ -137,7 +137,7 @@ void Entity_DrawEntityRec(Entity* entity, Color color)
 
 void Entity_DrawEntities(GameState* gs)
 {
-  for(size_t i = 0; i < EntityStack_Size(&gs->entities); i++)
+  for(int i = 0; i < EntityStack_Size(&gs->entities); i++)
   {
     Entity* entity = EntityStack_Get(&gs->entities, i);
     if(entity->isGround){
