@@ -1,9 +1,9 @@
-CC = gcc
+CC = clang
 CFLAGS = -Wall -g -fsanitize=address
 INC = ./include
 RAYLIB_INC = ./raylib/include
 RAYLIB_LIB = ./raylib/lib
-LDFLAGS = -lraylib -lGL -lm -ldl -lrt -lX11 -fsanitize=address -Wl,-rpath=$(RAYLIB_LIB)
+LDFLAGS = -lraylib -lm -lX11 -lGL -fsanitize=address -Wl,-rpath=$(RAYLIB_LIB)
 
 SRCS_DIR = src
 OBJS_DIR = obj

@@ -53,7 +53,7 @@ void GameState_Reset(GameState* gs)
   gs->entityFalling = 0;
   gs->score = 0;
   gs->anchorEntity.position.y = 0;
-  
+
   GameState_SetGround(gs);
 }
 

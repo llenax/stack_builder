@@ -2,7 +2,6 @@ project('stack_builder', 'c',
   version : '0.1',
   default_options : [
     'warning_level=3',   # roughly like -Wall
-    'b_sanitize=address', # -fsanitize=address
     'buildtype=debug'     # -g
   ]
 )

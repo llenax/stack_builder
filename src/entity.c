@@ -7,7 +7,7 @@ void Entity_UpdateFalling(GameState* gs)
   if (!gs->entityFalling) return;
 
   Entity* falling = &gs->fallingEntity;
-  falling->velocity.y = Lerp(falling->velocity.y, 200, GetFrameTime() * 14.0f);
+  falling->velocity.y = Lerp(falling->velocity.y, 600, GetFrameTime() * 14.0f);
 
   Entity_Fall(gs, falling);
 }
